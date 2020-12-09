@@ -19,7 +19,6 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -28,14 +27,16 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// Render main page of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { 
+  const templateVars = {
     urls: urlDatabase,
     username: req.cookies.username
-   };
+  };
   res.render("urls_index", templateVars);
 });
 
+// Render page for creating a new shortURL
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: req.cookies.username
@@ -43,48 +44,55 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+// Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
   let id = generateRandomString();
   urlDatabase[id] = req.body.longURL;
   res.redirect(`/urls/${id}`);
 });
 
+// Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect(`/urls`);
 });
 
+// Render page for the shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { 
-    shortURL: req.params.shortURL, 
+  const templateVars = {
+    shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     username: req.cookies.username
   };
   res.render("urls_show", templateVars);
 });
 
+// Redirect to submission webpage upon clicking on shortURL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
+// Redirect to shortURL page upon clicking Edit button from main URLs page
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
+// Login the user
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
   res.redirect("/urls");
 });
 
+// Log out the user
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
 
 function generateRandomString() {
