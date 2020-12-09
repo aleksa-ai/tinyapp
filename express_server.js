@@ -10,9 +10,31 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
+const generateRandomString = function() {
+  let result = '';
+  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 6; i++) {
+    result += characters.charAt(Math.floor(Math.random() * 6));
+  }
+  return result;
+};
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
 };
 
 app.get("/", (req, res) => {
@@ -91,20 +113,23 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-//Render registration page (submit form: 404 error since POST /register not created yet)
+//Render registration page
 app.get('/register', (req, res) => {
-  res.render('register')
-})
+  res.render('register');
+});
+
+// Creates new user in the users object
+app.post('/register', (req, res) => {
+  const newID = generateRandomString();
+  users[newID] = {
+    id: newID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  console.log(users);
+  res.redirect('/urls');
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-function generateRandomString() {
-  let result = '';
-  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * 6));
-  }
-  return result;
-}
