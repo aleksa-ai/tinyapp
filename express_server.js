@@ -91,6 +91,11 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//Render registration page (submit form: 404 error since POST /register not created yet)
+app.get('/register', (req, res) => {
+  res.render('register')
+})
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
