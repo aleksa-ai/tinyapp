@@ -26,7 +26,8 @@
     app.post('/register', (req, res) => {
       const { id, email, password } = req.body
   ```
-  B. Generate new user ID?
+  B. Generate new user ID
+    generateRandomString
 
   C. Insert new user ID and that user infor into users object
 
@@ -46,7 +47,7 @@
   ```javascript
   res.clearCookie('username'); //Take out
   res.clearCookie('user_id'); //Replace
-```
+  ```
   
   B.Pass user object to _header to display user's email
 
