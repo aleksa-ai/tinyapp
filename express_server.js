@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
+
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -25,16 +27,16 @@ const urlDatabase = {
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+  // "userRandomID": {
+  //   id: "userRandomID",
+  //   email: "user@example.com",
+  //   password: "purple-monkey-dinosaur"
+  // },
+  // "user2RandomID": {
+  //   id: "user2RandomID",
+  //   email: "user2@example.com",
+  //   password: "dishwasher-funk"
+  // }
 };
 
 const emailExists = email => {
@@ -106,11 +108,11 @@ app.post("/urls", (req, res) => {
 
 // Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
-   if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
   } else {
-    res.status(403)
+    res.status(403);
     res.send('Access is forbidden');
   }
 });
@@ -142,7 +144,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
-    res.status(403)
+    res.status(403);
     res.send('Access is forbidden');
   }
 });
@@ -156,7 +158,7 @@ app.post("/login", (req, res) => {
   } else if (!emailExists(req.body.email)) {
     res.status(403);
     res.send('Email does not exist');
-  } else if (users[userID].password !== req.body.password) {
+  } else if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
     res.status(403);
     res.send('Password does not match');
   } else {
@@ -200,7 +202,7 @@ app.post('/register', (req, res) => {
     users[newID] = {
       id: newID,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     res.cookie('user_id', newID);
     res.redirect('/urls');
