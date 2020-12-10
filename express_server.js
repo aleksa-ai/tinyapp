@@ -131,6 +131,11 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// Redirect to shortURL page upon clicking Edit button from main URLs page
+app.post("/urls/:shortURL/edit", (req, res) => {
+  res.redirect(`/urls/${req.params.shortURL}`);
+});
+
 // Delete existing shortURL: longURL
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
@@ -141,9 +146,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.send('Access is forbidden');
   }
 });
-
-// Redirect to shortURL page upon clicking Edit button from main URLs page
-  //Think I worked on this function when creating the previous one so it became the Delete existing shortURL: longURL, must re add it before submitting
 
 // Login the user if [email & password] entered & if email exists, password matches; otherwise error 400 &403 respectively
 app.post("/login", (req, res) => {
