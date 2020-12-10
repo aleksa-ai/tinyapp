@@ -37,6 +37,13 @@ const users = {
   }
 };
 
+const emailExists = email => {
+  for (let user in users) {
+    if (users[user].email === email) return true;
+  }
+  return false;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
