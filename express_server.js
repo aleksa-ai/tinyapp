@@ -128,16 +128,25 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
-// Creates new user in users object
+// Creates new user in users object if [email & password] entered & if email not already in use; otherwise error 400
 app.post('/register', (req, res) => {
-  const newID = generateRandomString();
-  users[newID] = {
-    id: newID,
-    email: req.body.email,
-    password: req.body.password
-  };
-  res.cookie('user_id', newID);
-  res.redirect('/urls');
+  if (!req.body.email || !req.body.password) {
+    res.status(400);
+    res.send('Email or password left empty');
+  } else if (emailExists(req.body.email)) {
+    res.status(400);
+    res.send('Email or password left empty');
+  } else {
+    const newID = generateRandomString();
+    users[newID] = {
+      id: newID,
+      email: req.body.email,
+      password: req.body.password
+    };
+    console.log(users);
+    res.cookie('user_id', newID);
+    res.redirect('/urls');
+  }
 });
 
 app.listen(PORT, () => {
