@@ -128,7 +128,7 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
-// Render the login page
+// Render login page
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.cookies.user_id]
