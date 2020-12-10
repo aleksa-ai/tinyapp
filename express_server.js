@@ -135,7 +135,7 @@ app.post('/register', (req, res) => {
     res.send('Email or password left empty');
   } else if (emailExists(req.body.email)) {
     res.status(400);
-    res.send('Email or password left empty');
+    res.send('Email is taken');
   } else {
     const newID = generateRandomString();
     users[newID] = {
