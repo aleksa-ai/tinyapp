@@ -49,7 +49,7 @@ const idPerEmail = email => {
     if (users[user].email === email) return users[user].id;
   }
   return null;
-}
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -119,15 +119,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/login", (req, res) => {
   const userID = idPerEmail(req.body.email);
   if (!req.body.email || !req.body.password) {
-    res.status(400)
+    res.status(400);
     res.send('Email or password left empty');
   } else if (!emailExists(req.body.email)) {
-    res.status(403)
+    res.status(403);
     res.send('Email does not exist');
   } else if (users[userID].password !== req.body.password) {
-    res.status(403)
+    res.status(403);
     res.send('Password does not match');
-  } else{
+  } else {
     res.cookie('user_id', userID);
     res.redirect("/urls");
   }
