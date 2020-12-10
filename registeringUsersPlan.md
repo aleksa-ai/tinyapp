@@ -104,8 +104,16 @@ app.get('/register', (req, res) => {
 # Refactoring login route
 
 1. Modify the POST /login route
-    * Need to send the appropriate user_id to cookies if login attempt is successful
-    * Return a 403 message if email does not exist or password is incorrect
+    * Send corresponding user_id to cookies if login attempt successful
+    * Return 403 message if email does not exist or password is incorrect
     * Redirect to /urls
 2. Merge feature/user-registration git branch with master
 
+## Basic Permission Features
+
+1. Only Registered Users Can Shorten URLs
+    * If someone not logged in when trying to access /urls/new, redirect to login page.
+2. URLs Belong to Users
+    * Change urlDatabase so values are objects containing the longURL and associated userID
+3. Anyone Can Visit Short URLs
+    * Test GET /u/:id routes to make sure they redirect for users, even if  aren't logged in
