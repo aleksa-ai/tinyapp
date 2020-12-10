@@ -139,3 +139,16 @@ app.get('/register', (req, res) => {
 3. Use bcrypt When Checking Passwords
     * bcrypt.compareSync(inputPassword, savedHashedPassword)
     * /login
+
+# Switching to Encrypted Cookies
+
+1. Install cookie-session middleware
+2. const cookieSession = require('cookie-session');
+
+```javascript
+  app.use(cookieSession({
+    name: 'session',
+    keys: [/* keys */],
+  }));
+```
+3. Update instances of cookies to session
