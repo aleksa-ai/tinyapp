@@ -70,13 +70,12 @@ app.get('/register', (req, res) => {
   ```
   
   * Pass user object to _header to display user's email
-  * * Switch username for user_id
 
 4. Result: Registration form to create new user & TinyApp automatically log us in as that user
 
   * Possible errors/bugs: 
-    * * Register without email or password? 
-    * * Register a user with existent email
+    * Register without email or password? 
+    * Register a user with existent email
 
 # Registration Error
 
@@ -84,7 +83,7 @@ app.get('/register', (req, res) => {
   * Empty email or password fields => send 400 status code
   * Email already exists => send 400 status code 
 
-    * * emailExists helper function to keep DRY:
+    * emailExists helper function to keep DRY:
     ```javascript
     const emailExists = email => {
       for (let user in users) {
@@ -93,11 +92,20 @@ app.get('/register', (req, res) => {
         return false;
         }
     ```
-    * * If no email / password => res.status(400); res.send('Email or password left empty');
-    * * else if emailExists(email) => res.status(400); res.send('Email is taken');
-    * * else... const newID...
+      * If no email / password => res.status(400); res.send('Email or password left empty');
+      * else if emailExists(email) => res.status(400); res.send('Email is taken');
+      * else... const newID...
 
 # New Login Page
 
 1. Create new login page & GET route
 2. Remove the login form field in header & replace  with login and register page links
+
+# Refactoring login route
+
+1. Modify the POST /login route
+    * Need to send the appropriate user_id to cookies if login attempt is successful
+    * Return a 403 message if email does not exist or password is incorrect
+    * Redirect to /urls
+2. Merge feature/user-registration git branch with master
+

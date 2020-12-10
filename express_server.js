@@ -44,6 +44,13 @@ const emailExists = email => {
   return false;
 };
 
+const idPerEmail = email => {
+  for (let user in users) {
+    if (users[user].email === email) return users[user].id;
+  }
+  return null;
+}
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -108,10 +115,22 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-// Login the user
+// Login the user if [email & password] entered & if email exists, password matches; otherwise error 400 &403 respectively
 app.post("/login", (req, res) => {
-  res.cookie('user_id', req.body.user_id);
-  res.redirect("/urls");
+  const userID = idPerEmail(req.body.email);
+  if (!req.body.email || !req.body.password) {
+    res.status(400)
+    res.send('Email or password left empty');
+  } else if (!emailExists(req.body.email)) {
+    res.status(403)
+    res.send('Email does not exist');
+  } else if (users[userID].password !== req.body.password) {
+    res.status(403)
+    res.send('Password does not match');
+  } else{
+    res.cookie('user_id', userID);
+    res.redirect("/urls");
+  }
 });
 
 // Log out the user
@@ -151,7 +170,6 @@ app.post('/register', (req, res) => {
       email: req.body.email,
       password: req.body.password
     };
-    console.log(users);
     res.cookie('user_id', newID);
     res.redirect('/urls');
   }
