@@ -96,3 +96,8 @@ app.get('/register', (req, res) => {
     * * If no email / password => res.status(400); res.send('Email or password left empty');
     * * else if emailExists(email) => res.status(400); res.send('Email is taken');
     * * else... const newID...
+
+# New Login Page
+
+1. Create new login page & GET route
+2. Remove the login form field in header & replace  with login and register page links
