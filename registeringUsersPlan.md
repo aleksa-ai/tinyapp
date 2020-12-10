@@ -117,3 +117,13 @@ app.get('/register', (req, res) => {
     * Change urlDatabase so values are objects containing the longURL and associated userID
 3. Anyone Can Visit Short URLs
     * Test GET /u/:id routes to make sure they redirect for users, even if  aren't logged in
+
+## More Permission Features
+
+1. Users Can Only See Their Own Shortened URLs
+    * /urls only displays URLs if user logged in
+        * Create urlsForUser(id) function
+    * /urls/:shortURL displays message?/prompt? instead of edit form if not logged in
+2. Users Can Only Edit or Delete Their Own URLs
+    * Update the edit and delete endpoints
+    * Test: "-X POST -i localhost:8080/urls/:shortURL/delete"
