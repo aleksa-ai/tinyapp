@@ -20,8 +20,8 @@ const generateRandomString = function() {
 };
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  "b6UTxQ": { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  "i3BoGr": { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
 const users = {
@@ -51,6 +51,16 @@ const idPerEmail = email => {
   return null;
 };
 
+const urlsForUser = id => {
+  let returnObj = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      returnObj[key] = urlDatabase[key];
+    }
+  }
+  return returnObj;
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -66,7 +76,7 @@ app.get("/hello", (req, res) => {
 // Render main page of URLs
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies.user_id),
     user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
@@ -90,7 +100,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[id] = {
     longURL: req.body.longURL,
     userID: req.cookies.user_id
-  };;
+  };
   res.redirect(`/urls/${id}`);
 });
 
