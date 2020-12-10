@@ -128,6 +128,14 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
+// Render the login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies.user_id]
+  };
+  res.render("login", templateVars);
+});
+
 // Creates new user in users object if [email & password] entered & if email not already in use; otherwise error 400
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
