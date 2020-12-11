@@ -41,19 +41,24 @@ const users = {
     password: bcrypt.hashSync("dishwasher-funk", 10)
   }};
 
-const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
+const { emailExists, getUserByEmail, urlsForUser, urlExists,userOwnsURL } = require('./helpers');
 
+//Welcome page behaviour
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 // Render main page of URLs
 app.get("/urls", (req, res) => {
@@ -76,10 +81,42 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+// Render page for the shortURL
+app.get("/urls/:shortURL", (req, res) => {
+  if (!urlExists(req.params.shortURL, urlDatabase)) {
+    res.status(400);
+    res.send('URL does not exist');
+  } else if (!req.session.user_id) {
+    res.status(403);
+    res.send('Access is forbidden');
+  } else if (!userOwnsURL(req.session.user_id, req.params.shortURL, urlDatabase)) {
+    res.status(403);
+    res.send('Access is forbidden: You are not the URL owner');
+  } else {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user: users[req.session.user_id]
+    };
+    res.render("urls_show", templateVars);
+  }
+});
+
+// Redirect to long URL webpage upon clicking on shortURL
+app.get("/u/:shortURL", (req, res) => {
+  if (urlDatabase[req.params.shortURL]) {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  } else {
+    res.status(404);
+    res.send('Requested URL could not be located or does not exist');
+  }
+});
+
 // Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
   if (!req.body.longURL) {
-    res.status(400)
+    res.status(400);
     res.send('Url not entered.');
   } else {
     let id = generateRandomString();
@@ -93,9 +130,10 @@ app.post("/urls", (req, res) => {
 
 // Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
-  if (!urlDatabase[req.params.id]) {
-    res.status(403)
-    res.send('Access is forbidden and the URL does not exist');
+  //console.log(urlDatabase[req.params.shortURL])
+  if (!urlDatabase[req.params.shortURL]) {
+    res.status(403);
+    res.send('Access is forbidden or the URL does not exist');
   } else if (!req.body.longURL) {
     res.status(400).send('Url not entered');
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
@@ -105,22 +143,6 @@ app.post("/urls/:shortURL", (req, res) => {
     res.status(403);
     res.send('Access is forbidden');
   }
-});
-
-// Render page for the shortURL
-app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session.user_id]
-  };
-  res.render("urls_show", templateVars);
-});
-
-// Redirect to long URL webpage upon clicking on shortURL
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
 });
 
 // Redirect to shortURL page upon clicking Edit button from main URLs page
@@ -139,6 +161,22 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 });
 
+// Render login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.session.user_id]
+  };
+  res.render("login", templateVars);
+});
+
+//Render registration page
+app.get('/register', (req, res) => {
+  const templateVars = {
+    user: users[req.session.user_id]
+  };
+  res.render('register', templateVars);
+});
+
 // Login the user if [email & password] entered & if email exists, password matches; otherwise error 400 &403 respectively
 app.post("/login", (req, res) => {
   const userID = getUserByEmail(req.body.email, users);
@@ -155,28 +193,6 @@ app.post("/login", (req, res) => {
     req.session.user_id = userID;
     res.redirect("/urls");
   }
-});
-
-// Log out the user
-app.post("/logout", (req, res) => {
-  req.session.user_id = null;
-  res.redirect("/urls");
-});
-
-//Render registration page
-app.get('/register', (req, res) => {
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render('register', templateVars);
-});
-
-// Render login page
-app.get("/login", (req, res) => {
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render("login", templateVars);
 });
 
 // Creates new user in users object if [email & password] entered & if email not already in use; otherwise error 400
@@ -199,6 +215,13 @@ app.post('/register', (req, res) => {
   }
 });
 
+// Log out the user
+app.post("/logout", (req, res) => {
+  req.session = null;
+  res.redirect("/urls");
+});
+
+// App listen function
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

@@ -25,4 +25,17 @@ const urlsForUser = (id, database) => {
   return returnObj;
 };
 
-module.exports = { emailExists, getUserByEmail, urlsForUser };
+// Check if input url exists in URL database
+const urlExists = (url, database) => {
+  if (Object.keys(database).includes(url)) return true;
+  return false;
+};
+
+// Check if user owns url
+const userOwnsURL = (id, url, database) => {
+  const userURLs = urlsForUser(id, database);
+  if (urlExists(url, userURLs)) return true;
+  return false;
+};
+
+module.exports = { emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL };
