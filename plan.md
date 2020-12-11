@@ -162,3 +162,5 @@ app.get('/register', (req, res) => {
     * Move getUserByEmail function in helpers.js and export
 
 3. Mocha and Chai
+    * Implement framework for testing (M&C, users data in express_server with bcrypt for passwords, helpersTest file)
+    * Write tests & Test
