@@ -130,19 +130,18 @@ app.post("/urls", (req, res) => {
 
 // Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
-  //console.log(urlDatabase[req.params.shortURL])
-  if (!urlDatabase[req.params.shortURL]) {
-    res.status(403);
-    res.send('Access is forbidden or the URL does not exist');
-  } else if (!req.body.longURL) {
-    res.status(400).
-    res.send('Url not entered');
-  } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-    res.redirect("/urls");
-  } else {
+  if (req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
     res.status(403);
     res.send('Access is forbidden');
+  } else if (!urlDatabase[req.params.shortURL]) {
+    res.status(403);
+    res.send('URL does not exist');
+  } else if (!req.body.longURL) {
+    res.status(400);
+    res.send('Url not entered');
+  } else {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+    res.redirect("/urls");
   }
 });
 
