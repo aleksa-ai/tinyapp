@@ -152,3 +152,13 @@ app.get('/register', (req, res) => {
   }));
 ```
 3. Update instances of cookies to session
+
+# Testing Helper Functions
+
+1. Refactor Helper Functions
+    * Modify existing getUserByEmail function to take in user's email & users database as parameters
+
+2. Create a Helper Functions Module
+    * Move getUserByEmail function in helpers.js and export
+
+3. Mocha and Chai

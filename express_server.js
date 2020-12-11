@@ -29,42 +29,9 @@ const urlDatabase = {
   "i3BoGr": { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
-const users = {
-  // "userRandomID": {
-  //   id: "userRandomID",
-  //   email: "user@example.com",
-  //   password: "purple-monkey-dinosaur"
-  // },
-  // "user2RandomID": {
-  //   id: "user2RandomID",
-  //   email: "user2@example.com",
-  //   password: "dishwasher-funk"
-  // }
-};
+const users = {};
 
-const emailExists = email => {
-  for (let user in users) {
-    if (users[user].email === email) return true;
-  }
-  return false;
-};
-
-const idPerEmail = email => {
-  for (let user in users) {
-    if (users[user].email === email) return users[user].id;
-  }
-  return null;
-};
-
-const urlsForUser = id => {
-  let returnObj = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      returnObj[key] = urlDatabase[key];
-    }
-  }
-  return returnObj;
-};
+const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -154,7 +121,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Login the user if [email & password] entered & if email exists, password matches; otherwise error 400 &403 respectively
 app.post("/login", (req, res) => {
-  const userID = idPerEmail(req.body.email);
+  const userID = getUserByEmail(req.body.email);
   if (!req.body.email || !req.body.password) {
     res.status(400);
     res.send('Email or password left empty');
