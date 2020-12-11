@@ -10,8 +10,9 @@ Security features include password hashing and cookie encryption.
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Screenshot of URLs page"](docs/urls-page.png)
+!["Screenshot of create page"](docs/create-page.png)
+!["Screenshot of edit page"](docs/edit-page.png)
 
 ## Dependencies
 
