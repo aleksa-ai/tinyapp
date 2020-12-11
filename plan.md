@@ -1,4 +1,52 @@
-# User Registration Form
+# Project Directives
+
+"This four-day project will have you building a web app using Node. The app will allow users to shorten long URLs much like TinyURL.com and bit.ly do.
+
+You will build an HTTP Server that handles requests from the browser (client). Along the way you'll get introduced to some more advanced JavaScript and Node concepts, and you'll also learn more about Express, a web framework which is very popular in the Node community."
+
+# Assignment incremetal steps
+
+## URL Shortening (Part 1)
+
+1. Create URL Submission Form
+    * Create views/urls_new.ejs
+      * Has form with action = /urls and method = POST
+      * Input textbox has name = longURL
+        * Attribute identifies data sent: key longURL to body of POST request
+2. Routes for /urls/new
+    * app.get("/urls/new")
+    * app.post("urls")
+      * Form has action attribute set to /urls
+      * Use req.body.longURL to access longURL from /urls/new
+
+3. Implement generateRandomString() in global scope
+
+4. App.post("urls")
+    * Save shortURL: longURL to urlDatabase
+    * Redirect to /urls/:shortURL
+5. Route for /u/:shortURL - method: GET
+    * Redirect to actual longURL webpage
+
+## Deleting URLs
+
+1. In urls_index.ejs, add form button (Delete) with method = POST 
+2. Route /urls/:shortURL/delete - method: POST
+    * Delete key: value pair corresponding to shortURL
+    * Redirect to "/urls"
+
+## Updating URLs
+
+1. In urls_show.ejs, add form that submits  updated long URL
+    * Submit using method: POST
+    * Action: /urls/:id
+2. Route for /urls/:id - method: POST
+    * Assign a new longURL to the existing shortURL
+    * Redirect to "/urls"
+3. In urls_index.ejs, add edit buttons 
+
+## Cookies in Express
+
+## User Registration Form
 1. Dev on feature/user-registration branch
 
 2. Create Registration page (incl. form w email & password fields)
@@ -20,7 +68,7 @@ app.get('/register', (req, res) => {
   res.render('register')
 })
 ```
-# Registering New Users
+## Registering New Users
 
 1. Add users object (from instructions)
 
@@ -77,7 +125,7 @@ app.get('/register', (req, res) => {
     * Register without email or password? 
     * Register a user with existent email
 
-# Registration Error
+## Registration Error
 
 1. Handle Registration Errors per following conditions:
   * Empty email or password fields => send 400 status code
@@ -96,7 +144,7 @@ app.get('/register', (req, res) => {
       * else if emailExists(email) => res.status(400); res.send('Email is taken');
       * else... const newID...
 
-# New Login Page
+## New Login Page
 
 1. Create new login page & GET route
 2. Remove the login form field in header & replace  with login and register page links
@@ -109,7 +157,7 @@ app.get('/register', (req, res) => {
     * Redirect to /urls
 2. Merge feature/user-registration git branch with master
 
-# Basic Permission Features
+## Basic Permission Features
 
 1. Only Registered Users Can Shorten URLs
     * If someone not logged in when trying to access /urls/new, redirect to login page.
@@ -118,7 +166,7 @@ app.get('/register', (req, res) => {
 3. Anyone Can Visit Short URLs
     * Test GET /u/:id routes to make sure they redirect for users, even if  aren't logged in
 
-# More Permission Features
+## More Permission Features
 
 1. Users Can Only See Their Own Shortened URLs
     * /urls only displays URLs if user logged in
@@ -128,7 +176,7 @@ app.get('/register', (req, res) => {
     * Update the edit and delete endpoints
     * Test: "-X POST -i localhost:8080/urls/:shortURL/delete"
 
-# Storing Passwords Securely
+## Storing Passwords Securely
 
 1. Add bcrypt to Project
     * npm install bcrypt
@@ -140,7 +188,7 @@ app.get('/register', (req, res) => {
     * bcrypt.compareSync(inputPassword, savedHashedPassword)
     * /login
 
-# Switching to Encrypted Cookies
+## Switching to Encrypted Cookies
 
 1. Install cookie-session middleware
 2. const cookieSession = require('cookie-session');
@@ -153,7 +201,7 @@ app.get('/register', (req, res) => {
 ```
 3. Update instances of cookies to session
 
-# Testing Helper Functions
+## Testing Helper Functions
 
 1. Refactor Helper Functions
     * Modify existing getUserByEmail function to take in user's email & users database as parameters

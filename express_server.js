@@ -135,7 +135,8 @@ app.post("/urls/:shortURL", (req, res) => {
     res.status(403);
     res.send('Access is forbidden or the URL does not exist');
   } else if (!req.body.longURL) {
-    res.status(400).send('Url not entered');
+    res.status(400).
+    res.send('Url not entered');
   } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
