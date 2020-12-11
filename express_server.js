@@ -15,6 +15,7 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
+// Generate random 6-character-long string
 const generateRandomString = function() {
   let result = '';
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -24,22 +25,13 @@ const generateRandomString = function() {
   return result;
 };
 
+// Object to contain short URLs with corresponding long URL and user ID
 const urlDatabase = {
-  "b6UTxQ": { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  "i3BoGr": { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
+// Object to contain user with their infos
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("dishwasher-funk", 10)
-  }};
+};
 
 const { emailExists, getUserByEmail, urlsForUser, urlExists,userOwnsURL } = require('./helpers');
 
@@ -51,14 +43,6 @@ app.get("/", (req, res) => {
     res.redirect("/login");
   }
 });
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
 // Render main page of URLs
 app.get("/urls", (req, res) => {
@@ -84,14 +68,11 @@ app.get("/urls/new", (req, res) => {
 // Render page for the shortURL
 app.get("/urls/:shortURL", (req, res) => {
   if (!urlExists(req.params.shortURL, urlDatabase)) {
-    res.status(400);
-    res.send('URL does not exist');
+    res.status(400).send('URL does not exist');
   } else if (!req.session.user_id) {
-    res.status(403);
-    res.send('Access is forbidden');
+    res.status(403).send('Access is forbidden');
   } else if (!userOwnsURL(req.session.user_id, req.params.shortURL, urlDatabase)) {
-    res.status(403);
-    res.send('Access is forbidden: You are not the URL owner');
+    res.status(403).send('Access is forbidden: You are not the URL owner');
   } else {
     const templateVars = {
       shortURL: req.params.shortURL,
@@ -108,16 +89,14 @@ app.get("/u/:shortURL", (req, res) => {
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   } else {
-    res.status(404);
-    res.send('Requested URL could not be located or does not exist');
+    res.status(404).send('Requested URL could not be located or does not exist');
   }
 });
 
 // Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
   if (!req.body.longURL) {
-    res.status(400);
-    res.send('Url not entered.');
+    res.status(400).send('Url not entered.');
   } else {
     let id = generateRandomString();
     urlDatabase[id] = {
@@ -131,14 +110,11 @@ app.post("/urls", (req, res) => {
 // Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
   if (req.session.user_id !== urlDatabase[req.params.shortURL].userID) {
-    res.status(403);
-    res.send('Access is forbidden');
+    res.status(403).send('Access is forbidden');
   } else if (!urlDatabase[req.params.shortURL]) {
-    res.status(403);
-    res.send('URL does not exist');
+    res.status(403).send('URL does not exist');
   } else if (!req.body.longURL) {
-    res.status(400);
-    res.send('Url not entered');
+    res.status(400).send('Url not entered');
   } else {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
@@ -156,8 +132,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
-    res.status(403);
-    res.send('Access is forbidden');
+    res.status(403).send('Access is forbidden');
   }
 });
 
@@ -181,14 +156,11 @@ app.get('/register', (req, res) => {
 app.post("/login", (req, res) => {
   const userID = getUserByEmail(req.body.email, users);
   if (!req.body.email || !req.body.password) {
-    res.status(400);
-    res.send('Email or password left empty');
+    res.status(400).send('Email or password left empty');
   } else if (!emailExists(req.body.email, users)) {
-    res.status(403);
-    res.send('Email does not exist');
+    res.status(403).send('Email does not exist');
   } else if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
-    res.status(403);
-    res.send('Password does not match');
+    res.status(403).send('Password does not match');
   } else {
     req.session.user_id = userID;
     res.redirect("/urls");
@@ -198,11 +170,9 @@ app.post("/login", (req, res) => {
 // Creates new user in users object if [email & password] entered & if email not already in use; otherwise error 400
 app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
-    res.status(400);
-    res.send('Email or password left empty');
+    res.status(400).send('Email or password left empty');
   } else if (emailExists(req.body.email, users)) {
-    res.status(400);
-    res.send('Email is taken');
+    res.status(400).send('Email is taken');
   } else {
     const newID = generateRandomString();
     users[newID] = {
