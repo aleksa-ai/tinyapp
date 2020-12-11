@@ -31,15 +31,15 @@ const urlDatabase = {
 
 const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
-},
+  },
   "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: bcrypt.hashSync("dishwasher-funk", 10)
-}};
+  }};
 
 const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
 
@@ -58,7 +58,7 @@ app.get("/hello", (req, res) => {
 // Render main page of URLs
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
@@ -78,17 +78,27 @@ app.get("/urls/new", (req, res) => {
 
 // Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
-  let id = generateRandomString();
-  urlDatabase[id] = {
-    longURL: req.body.longURL,
-    userID: req.session.user_id
-  };
-  res.redirect(`/urls/${id}`);
+  if (!req.body.longURL) {
+    res.status(400)
+    res.send('Url not entered.');
+  } else {
+    let id = generateRandomString();
+    urlDatabase[id] = {
+      longURL: req.body.longURL,
+      userID: req.session.user_id
+    };
+    res.redirect(`/urls/${id}`);
+  }
 });
 
 // Edit existing shortURL
 app.post("/urls/:shortURL", (req, res) => {
-  if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
+  if (!urlDatabase[req.params.id]) {
+    res.status(403)
+    res.send('Access is forbidden and the URL does not exist');
+  } else if (!req.body.longURL) {
+    res.status(400).send('Url not entered');
+  } else if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     urlDatabase[req.params.shortURL].longURL = req.body.longURL;
     res.redirect("/urls");
   } else {
@@ -131,11 +141,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // Login the user if [email & password] entered & if email exists, password matches; otherwise error 400 &403 respectively
 app.post("/login", (req, res) => {
-  const userID = getUserByEmail(req.body.email);
+  const userID = getUserByEmail(req.body.email, users);
   if (!req.body.email || !req.body.password) {
     res.status(400);
     res.send('Email or password left empty');
-  } else if (!emailExists(req.body.email)) {
+  } else if (!emailExists(req.body.email, users)) {
     res.status(403);
     res.send('Email does not exist');
   } else if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
@@ -174,7 +184,7 @@ app.post('/register', (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.status(400);
     res.send('Email or password left empty');
-  } else if (emailExists(req.body.email)) {
+  } else if (emailExists(req.body.email, users)) {
     res.status(400);
     res.send('Email is taken');
   } else {
